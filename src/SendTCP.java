@@ -12,7 +12,7 @@ public class SendTCP {
 
   public static void main(String args[]) throws Exception {
 
-    byte reqID = 0;
+    long reqID = 1;
     boolean finished = false;
     while (!finished) {
       if (args.length != 2 && args.length != 3)  // Test for correct # of args
@@ -34,26 +34,30 @@ public class SendTCP {
       Socket sock = new Socket(destAddr, destPort);
 
       //prompts user for input, creates request object
-      Request liveRequest = newRequest(reqID);
-      RequestEncoderBin reqEncoder = new RequestEncoderBin();
+      Request liveRequest = newRequest((byte) reqID);
+      EncoderBin reqEncoder = new EncoderBin();
+      DecoderBin respDecoder = new DecoderBin();
 
-
-
+      long startTime = System.nanoTime();
       OutputStream out = sock.getOutputStream(); // Get a handle onto Output Stream
-
-      reqEncoder.encode(liveRequest); // Encode the REQUEST and send
+      out.write(reqEncoder.encodeRequest(liveRequest)); // Encode the REQUEST and send
 
       //gets data and returns
+      //DECODES OUR PACKET
+      Response result = respDecoder.decodeResponse(new DataInputStream(sock.getInputStream()));
+      long endTime = System.nanoTime();
+      //store response in byte array & print
+      byte[] bArray = {9, result.ID, result.errorCode, result.result, result.checksum};
+      System.out.println("\nresponse: TML, ID, error code, result, checksum");
 
-
-      //DECODE RESPONSE
-      ResponseDecoderBin respDecoder = new ResponseDecoderBin();
-      Response result = respDecoder.decode(sock.getInputStream()); //DECODES OUR PACKET
 
       //parse and return the resulting packet
-      printo(result);
 
+      System.out.println(result.TML + " " + result.ID + " " + result.errorCode
+              +  " " + result.result + " " + 00);
 
+      long totalTime = (endTime - startTime) /1000000;
+      System.out.println("time elapsed: " + totalTime + "ms");
 
       System.out.print("continue? 'y' to continue, 'n' to quit: ");
       String answer = scan.nextLine();
@@ -99,7 +103,7 @@ public class SendTCP {
       System.out.println("equation entered: (" + num3 + " * " + x + "^3) + (" + num2 + " * " + x
               + "^2) + (" + num1 + " * " + x + ") + " + num0);
       byteToHexadecimal(barray1);
-      equation = new Request(reqID, x, num3, num2, num1, num0);
+      equation = new Request(TML, reqID, x, num3, num2, num1, num0);
 
       return equation;
 

@@ -1,7 +1,7 @@
 
 public class Request {
 
-    public long ID;            // Item identification number
+    public byte ID;            // Item identification number
     public byte symbol;
 
     public byte numOne;
@@ -13,7 +13,8 @@ public class Request {
     public byte x;
 
 
-    public Request(long pID, byte pX, byte pNumThree, byte pNumTwo, byte pNumOne, byte pNumZero)  {
+    public Request(byte pTML, byte pID, byte pX, byte pNumThree, byte pNumTwo, byte pNumOne, byte pNumZero)  {
+        this.TML = pTML;
         this.ID = pID;
         this.x = pX;
         this.numZero = pNumZero;
